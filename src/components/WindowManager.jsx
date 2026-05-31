@@ -382,7 +382,7 @@ function ContactContent() {
 
       <div className="space-y-6 text-[#5c4f4f] text-lg mt-2">
         <p>
-          The easiest way to reach me is through LinkedIn, but feel free to connect with me on GitHub or shoot me an email as well! I don't use much of social media so LinkedIn or Email would be preffered.
+          The easiest way to reach me is through email, but feel free to connect with me on GitHub or LinkedIn as well! I don't use much of social media so LinkedIn or Email would be preffered.
           </p>
         <p className="font-bold text-[#d97373]">
           I am currently looking for internship opportunities and open-source collaborations.
@@ -391,9 +391,9 @@ function ContactContent() {
         {/* The Contact Links */}
         <div className="flex flex-col gap-4 mt-6">
           
-          <a href="mailto:placeholder@wip.com" className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4 p-4 border-4 border-[#5c4f4f] bg-[#e4dcc6] hover:bg-[#d97373] hover:text-[#f4ece6] transition-colors group">
+          <a href="mailto:hi@sandeepganesan.com" className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4 p-4 border-4 border-[#5c4f4f] bg-[#e4dcc6] hover:bg-[#d97373] hover:text-[#f4ece6] transition-colors group">
             <span className="font-bold uppercase tracking-wider">Email</span>
-            <span className="text-sm opacity-80 group-hover:opacity-100 md:ml-auto break-all sm:break-normal">placeholder@wip.com</span>
+            <span className="text-sm opacity-80 group-hover:opacity-100 md:ml-auto break-all sm:break-normal">hi@sandeepganesan.com</span>
           </a>
 
           <a href="https://github.com/sandeep-ganesan" target="_blank" rel="noopener noreferrer" className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4 p-4 border-4 border-[#5c4f4f] bg-[#e4dcc6] hover:bg-[#d97373] hover:text-[#f4ece6] transition-colors group">
