@@ -93,7 +93,7 @@ function DraggableWindow({ win, index }) {
             <div className="flex items-center gap-6 border-b-4 border-[#8f9ca6] pb-6">
               {/* Profile Picture Placeholder */}
               <div className="w-48 h-48 bg-[#c9d4d9] border-4 border-[#5c4f4f] flex-shrink-0 shadow-[4px_4px_0px_0px_rgba(92,79,79,0.2)]">
-  <img src="public/media/bk_pic.png" alt="Profile" className="w-full h-full object-cover pixel-art" />
+  <img src="media/bk_pic.png" alt="Profile" className="w-full h-full object-cover pixel-art" />
               </div>
               <div>
                 <h2 className="text-3xl font-bold tracking-widest text-[#2c2626]">Sandeep Ganesan</h2>
