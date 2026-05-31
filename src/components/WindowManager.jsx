@@ -14,7 +14,7 @@ function DraggableWindow({ win, index }) {
       const safeHeight = Math.min(750, window.innerHeight * 0.90);
       
       // Create a random offset between -25px and +25px
-      const jitterX = Math.floor(Math.random() * 50) - 25;
+      const jitterX = Math.floor(Math.random() * 50) - 100;
       const jitterY = Math.floor(Math.random() * 50) - 25;
 
       // Shift base slightly up/left (-30), increase index cascade (+40), and apply jitter
