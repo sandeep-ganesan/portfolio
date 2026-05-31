@@ -7,7 +7,7 @@ function DraggableWindow({ win, index }) {
   // Stagger new windows based on how many are open
   const [pos, setPos] = useState(() => {
     if (typeof window !== 'undefined') {
-      const startX = (window.innerWidth / 2) - 700 + (index * 30);
+      const startX = (window.innerWidth / 2) - 500 + (index * 30);
       const startY = (window.innerHeight / 2) - 450 + (index * 30);
       return { x: startX, y: startY };
     }
