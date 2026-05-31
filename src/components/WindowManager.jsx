@@ -4,20 +4,30 @@ import { openWindows, closeWindow, focusWindow } from '../store/windows';
 
 // 1. We create a custom component for an individual window
 function DraggableWindow({ win, index }) {
-  // Stagger new windows based on how many are open
+  // NEW: A ref to measure the window's actual physical size on screen
+  const windowRef = useRef(null);
+
+  // Stagger new windows based on how many are open, adjusting for small browser sizes
   const [pos, setPos] = useState(() => {
     if (typeof window !== 'undefined') {
-      const startX = (window.innerWidth / 2) - 900 + (index * 30);
-      const startY = (window.innerHeight / 2) - 450 + (index * 30);
+      const safeWidth = Math.min(900, window.innerWidth * 0.95);
+      const safeHeight = Math.min(750, window.innerHeight * 0.90);
+      
+      // Create a random offset between -25px and +25px
+      const jitterX = Math.floor(Math.random() * 50) - 100;
+      const jitterY = Math.floor(Math.random() * 50) - 25;
+
+      // Shift base slightly up/left (-30), increase index cascade (+40), and apply jitter
+      const startX = Math.max(10, (window.innerWidth / 2) - (safeWidth / 2) - 30 + (index * 40) + jitterX);
+      const startY = Math.max(10, (window.innerHeight / 2) - (safeHeight / 2) - 30 + (index * 40) + jitterY);
+      
       return { x: startX, y: startY };
     }
     // Fallback just in case
-    return { x: 100, y: 100 }; 
+    return { x: 10, y: 10 }; 
   });
-  const [isDragging, setIsDragging] = useState(false);
   
-  // We use a ref to track exactly where on the header you clicked, 
-  // so the window doesn't snap to the top-left of your mouse.
+  const [isDragging, setIsDragging] = useState(false);
   const dragOffset = useRef({ x: 0, y: 0 });
 
   const handlePointerDown = (e) => {
@@ -26,24 +36,25 @@ function DraggableWindow({ win, index }) {
       x: e.clientX - pos.x,
       y: e.clientY - pos.y,
     };
-    // This crucial line keeps it dragging even if your mouse moves fast!
     e.target.setPointerCapture(e.pointerId); 
   };
 
   const handlePointerMove = (e) => {
-    if (!isDragging) return;
+    // NEW: Ensure we have a reference to the window element before moving
+    if (!isDragging || !windowRef.current) return;
 
     let newX = e.clientX - dragOffset.current.x;
     let newY = e.clientY - dragOffset.current.y;
 
-    const winWidth = 900;
-    const titleBarHeight = 40; // Approximate height of your header
-    const minVisibleX = 100; // Require at least 100px of the header to stay on screen horizontally
+    // NEW: Read the actual dynamically resized width of the window instead of hardcoding 900
+    const winWidth = windowRef.current.offsetWidth;
+    const titleBarHeight = 40; 
+    const minVisibleX = 100; 
 
-    // 1. Horizontal Clamp:
+    // Horizontal Clamp
     newX = Math.max(-winWidth + minVisibleX, Math.min(newX, window.innerWidth - minVisibleX));
     
-    // 2. Vertical Clamp: 
+    // Vertical Clamp
     newY = Math.max(0, Math.min(newY, window.innerHeight - titleBarHeight));
 
     setPos({ x: newX, y: newY });
@@ -56,12 +67,14 @@ function DraggableWindow({ win, index }) {
 
   return (
     <div 
-    onPointerDown={() => focusWindow(win.id)}
-      className="absolute flex flex-col w-[900px] h-[750px] bg-[#f4ece6] border-4 border-[#5c4f4f] shadow-[8px_8px_0px_0px_rgba(92,79,79,0.3)]"
+      ref={windowRef}
+      onPointerDown={() => focusWindow(win.id)}
+      // NEW: Added max-w-[95vw] and max-h-[90vh] so the window shrinks on smaller monitors
+      className="absolute flex flex-col bg-[#f4ece6] pointer-events-auto max-md:!left-0 max-md:!top-0 max-md:!w-full max-md:!h-[100dvh] max-md:border-none max-md:shadow-none border-4 border-[#5c4f4f] shadow-[8px_8px_0px_0px_rgba(92,79,79,0.3)] w-[900px] h-[750px] max-w-[95vw] max-h-[90vh]"
       style={{ 
         left: pos.x, 
         top: pos.y, 
-        zIndex: win.zIndex || 10 
+        zIndex: 100 + (win.zIndex || 0) 
       }}
     >
       {/* --- THE DRAG HANDLE (HEADER) --- */}
@@ -69,31 +82,30 @@ function DraggableWindow({ win, index }) {
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
-        className="bg-[#8f9ca6] text-[#2c2626] px-3 py-2 flex justify-between items-center border-b-4 border-[#5c4f4f] cursor-default select-none touch-none"
+        className="bg-[#8f9ca6] text-[#2c2626] px-3 py-2 flex justify-between items-center border-b-4 border-[#5c4f4f] cursor-default select-none touch-none max-md:py-3"
       >
         <span className="font-bold tracking-widest text-sm uppercase pointer-events-none">
           {win.title}
         </span>
         <button 
-          onPointerDown={(e) => e.stopPropagation()} // Prevents dragging when clicking close
+          onPointerDown={(e) => e.stopPropagation()} 
           onClick={() => closeWindow(win.id)}
-          className="text-[#2c2626] hover:text-[#d97373] font-bold cursor-default transition-transform hover:scale-110"
+          className="text-[#2c2626] hover:text-[#d97373] font-bold cursor-default transition-transform hover:scale-110 text-lg md:text-base px-2"
         >
           [X]
         </button>
       </div>
 
       {/* --- THE WINDOW CONTENT --- */}
-      <div className="flex-1 p-6 overflow-y-auto text-[#5c4f4f] leading-relaxed cursor-auto">
+      <div className="flex-1 p-4 md:p-6 overflow-y-auto text-[#5c4f4f] leading-relaxed cursor-auto">
         
         {win.id === 'about' && (
-          <div className="flex flex-col gap-4 h-full overflow-y-auto pr-2 pb-12 pointer-events-auto">
+          <div className="flex flex-col gap-4 h-full overflow-y-auto md:pr-2 pb-12 pointer-events-auto">
             
             {/* Top Profile Header */}
-            <div className="flex items-center gap-6 border-b-4 border-[#8f9ca6] pb-6">
-              {/* Profile Picture Placeholder */}
-              <div className="w-48 h-48 bg-[#c9d4d9] border-4 border-[#5c4f4f] flex-shrink-0 shadow-[4px_4px_0px_0px_rgba(92,79,79,0.2)]">
-  <img src="media/bk_pic.png" alt="Profile" className="w-full h-full object-cover pixel-art" />
+            <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-6 border-b-4 border-[#8f9ca6] pb-6">
+              <div className="w-48 h-48 md:w-64 md:h-64 bg-[#c9d4d9] border-4 border-[#5c4f4f] flex-shrink-0 shadow-[4px_4px_0px_0px_rgba(92,79,79,0.2)]">
+                <img src="media/bk_pic.png" alt="Profile" className="w-full h-full object-cover pixel-art" />
               </div>
               <div>
                 <h2 className="text-3xl font-bold tracking-widest text-[#2c2626]">Sandeep Ganesan</h2>
@@ -114,32 +126,32 @@ function DraggableWindow({ win, index }) {
               </p>
 
               <div>
-            <h3 className="text-xl font-bold text-[#d97373] border-b-2 border-[#d97373]/30 inline-block mb-2">
-              Education
-            </h3>
-            <p>
-              B.Engg. in Information Systems Science and Engineering, <strong>Ritsumeikan University</strong>, Expected Graduation: <strong>2028</strong>
-            </p>
-          </div>
-          <div>
-            <h3 className="text-xl font-bold text-[#d97373] border-b-2 border-[#d97373]/30 inline-block mb-2">
-              Other Interests
-            </h3>
-            <ul className="list-disc list-inside space-y-1">
-              <li><strong>Gaming:</strong> I like to play some video games in my free time. Current favorite is <em>Rainbow Six Siege</em>.</li>
-              <li><strong>Drawing silly art:</strong> I draw silly art when I am bored. The current profile picture is something I drew.</li>
-            </ul>
-          </div>
+                <h3 className="text-xl font-bold text-[#d97373] border-b-2 border-[#d97373]/30 inline-block mb-2">
+                  Education
+                </h3>
+                <p>
+                  B.Engg. in Information Systems Science and Engineering, <strong>Ritsumeikan University</strong>, Expected Graduation: <strong>2028</strong>
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-[#d97373] border-b-2 border-[#d97373]/30 inline-block mb-2">
+                  Other Interests
+                </h3>
+                <ul className="list-disc list-inside space-y-1">
+                  <li><strong>Gaming:</strong> I like to play some video games in my free time. Current favorite is <em>Rainbow Six Siege</em>.</li>
+                  <li><strong>Drawing silly art:</strong> I draw silly art when I am bored. The current profile picture is something I drew.</li>
+                </ul>
+              </div>
             </div>
 
             <div>
-            <h3 className="text-xl font-bold text-[#d97373] border-b-2 border-[#d97373]/30 inline-block mb-2">
-              Language Proficiency
-            </h3>
-            <p>
-              I am fluent in English and Tamil and have conversational proficiency in Japanese.
-            </p>
-          </div>
+              <h3 className="text-xl font-bold text-[#d97373] border-b-2 border-[#d97373]/30 inline-block mb-2">
+                Language Proficiency
+              </h3>
+              <p>
+                I am fluent in English and Tamil and have conversational proficiency in Japanese.
+              </p>
+            </div>
 
           </div>
         )}
@@ -177,7 +189,7 @@ function DraggableWindow({ win, index }) {
                 
                 <li className="flex flex-col">
                   <span className="font-bold text-[#d97373]">Music</span>
-                  <span><a href="https://incompetech.com/" target="_blank" rel="noopener noreferrer" className="hover:underline">Gymnopedie No. 1 by Erik Satie (performed by Kevin MacLeod)</a></span>
+                  <span><a href="https://incompetech.com/" target="_blank" rel="noopener noreferrer" className="hover:underline break-all sm:break-normal">Gymnopedie No. 1 by Erik Satie (performed by Kevin MacLeod)</a></span>
                 </li>
 
                 <li className="flex flex-col">
@@ -185,13 +197,13 @@ function DraggableWindow({ win, index }) {
                   <span>DotGothic16 via Google Fonts</span>
                 </li>
                 <li className="flex flex-col">
-  <span className="font-bold text-[#d97373]">Icons</span>
-  <span>
-    <a href="https://fonts.google.com/icons" target="_blank" rel="noopener noreferrer" className="hover:underline">
-      Material Design Icons by Google
-    </a>
-  </span>
-</li>
+                  <span className="font-bold text-[#d97373]">Icons</span>
+                  <span>
+                    <a href="https://fonts.google.com/icons" target="_blank" rel="noopener noreferrer" className="hover:underline">
+                      Material Design Icons by Google
+                    </a>
+                  </span>
+                </li>
               </ul>
             </div>
           </div>
@@ -242,7 +254,6 @@ function ProjectsContent() {
       }
     },
     {
-      // NEW SCHOOL PROJECT ADDED HERE
       id: 3,
       title: "Dynamic VAA Updater",
       category: "school",
@@ -257,6 +268,23 @@ function ProjectsContent() {
         ],
         architecture: "Collects real-time social media data, filtering it via BERTopic. Processed text undergoes sentiment analysis using a BERT model fine-tuned on political manifestos, then uses semantic algorithms to flag orientation shifts for VAA updates."
       }
+    },
+    {
+      id: 4,
+      title: "Cozy Portfolio",
+      category: "personal",
+      stack: "Astro • React • Tailwind • Nanostores",
+      description: "A highly interactive, custom-built portfolio website, featuring a fully functional window manager and retro aesthetics.",
+      github: "https://github.com/sandeep-ganesan/portfolio", // Update this if your repo name is different!
+      details: {
+        features: [
+          "Custom React window manager with draggable bounds clamping",
+          "Simplistic design that is easy to navigate and mobile-friendly",
+          "Features background music and language options (WIP)",
+          "Global state management across UI components using Nanostores"
+        ],
+        architecture: "Built on an Astro foundation to ship zero-JavaScript static HTML by default. Interactive elements like the draggable windows and dock are injected as React 'Islands', utilizing Nanostores to share global state (like active windows and focus hierarchy) across isolated components."
+      }
     }
   ];
 
@@ -265,7 +293,7 @@ function ProjectsContent() {
     : projects.filter(p => p.category === filter);
 
   return (
-    <div className="flex flex-col gap-4 h-full overflow-y-auto pr-2 pb-12 pointer-events-auto">
+    <div className="flex flex-col gap-4 h-full overflow-y-auto md:pr-2 pb-12 pointer-events-auto">
       
       {/* The Main Header */}
       <h2 className="text-3xl font-bold tracking-widest text-[#2c2626] uppercase border-b-4 border-[#8f9ca6] pb-4 sticky top-0 bg-[#f4ece6] z-10 pt-2">
@@ -273,7 +301,7 @@ function ProjectsContent() {
       </h2>
       
       {/* The Filter Buttons */}
-      <div className="flex gap-4">
+      <div className="flex flex-wrap gap-3 md:gap-4">
         <button
           onClick={() => setFilter('all')}
           className={`px-4 py-2 border-4 border-[#5c4f4f] font-bold transition-transform shadow-[4px_4px_0px_0px_rgba(92,79,79,0.3)] 
@@ -303,7 +331,7 @@ function ProjectsContent() {
            <div key={project.id} className="border-4 border-[#5c4f4f] bg-[#e4dcc6] flex flex-col shadow-[4px_4px_0px_0px_rgba(92,79,79,0.2)]">
              
              {/* Card Header */}
-             <div className="p-4 border-b-4 border-[#5c4f4f] bg-[#c9d4d9] flex justify-between items-start">
+             <div className="p-4 border-b-4 border-[#5c4f4f] bg-[#c9d4d9] flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
                <div>
                  <h3 className="font-bold text-2xl text-[#2c2626] tracking-wide">{project.title}</h3>
                  <span className="text-sm font-bold text-[#d97373]">{project.stack}</span>
@@ -362,7 +390,7 @@ function ProjectsContent() {
 // A dedicated component for the Contact window
 function ContactContent() {
   return (
-    <div className="flex flex-col gap-4 h-full overflow-y-auto pr-2 pb-12 pointer-events-auto">
+    <div className="flex flex-col gap-4 h-full overflow-y-auto md:pr-2 pb-12 pointer-events-auto">
       
       {/* The Main Header */}
       <h2 className="text-3xl font-bold tracking-widest text-[#2c2626] uppercase border-b-4 border-[#8f9ca6] pb-4">
@@ -371,7 +399,7 @@ function ContactContent() {
 
       <div className="space-y-6 text-[#5c4f4f] text-lg mt-2">
         <p>
-          The easiest way to reach me is through LinkedIn, but feel free to connect with me on GitHub or shoot me an email as well! I don't use much of social media so LinkedIn or Email would be preffered.
+          The easiest way to reach me is through email, but feel free to connect with me on GitHub or LinkedIn as well! I don't use much of social media so LinkedIn or Email would be preffered.
           </p>
         <p className="font-bold text-[#d97373]">
           I am currently looking for internship opportunities and open-source collaborations.
@@ -380,23 +408,23 @@ function ContactContent() {
         {/* The Contact Links */}
         <div className="flex flex-col gap-4 mt-6">
           
-          <a href="mailto:placeholder@wip.com" className="flex items-center gap-4 p-4 border-4 border-[#5c4f4f] bg-[#e4dcc6] hover:bg-[#d97373] hover:text-[#f4ece6] transition-colors group">
+          <a href="mailto:hi@sandeepganesan.com" className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4 p-4 border-4 border-[#5c4f4f] bg-[#e4dcc6] hover:bg-[#d97373] hover:text-[#f4ece6] transition-colors group">
             <span className="font-bold uppercase tracking-wider">Email</span>
-            <span className="text-sm opacity-80 group-hover:opacity-100 ml-auto">placeholder@wip.com</span>
+            <span className="text-sm opacity-80 group-hover:opacity-100 md:ml-auto break-all sm:break-normal">hi@sandeepganesan.com</span>
           </a>
 
-          <a href="https://github.com/sandeep-ganesan" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 p-4 border-4 border-[#5c4f4f] bg-[#e4dcc6] hover:bg-[#d97373] hover:text-[#f4ece6] transition-colors group">
+          <a href="https://github.com/sandeep-ganesan" target="_blank" rel="noopener noreferrer" className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4 p-4 border-4 border-[#5c4f4f] bg-[#e4dcc6] hover:bg-[#d97373] hover:text-[#f4ece6] transition-colors group">
             <span className="font-bold uppercase tracking-wider">GitHub</span>
-            <span className="text-sm opacity-80 group-hover:opacity-100 ml-auto">@sandeep-ganesan</span>
+            <span className="text-sm opacity-80 group-hover:opacity-100 md:ml-auto break-all sm:break-normal">@sandeep-ganesan</span>
           </a>
 
-          <a href="https://linkedin.com/in/sandeep-ganesan-7ab40b366" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 p-4 border-4 border-[#5c4f4f] bg-[#e4dcc6] hover:bg-[#d97373] hover:text-[#f4ece6] transition-colors group">
+          <a href="https://linkedin.com/in/sandeep-ganesan-7ab40b366" target="_blank" rel="noopener noreferrer" className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4 p-4 border-4 border-[#5c4f4f] bg-[#e4dcc6] hover:bg-[#d97373] hover:text-[#f4ece6] transition-colors group">
             <span className="font-bold uppercase tracking-wider">LinkedIn</span>
-            <span className="text-sm opacity-80 group-hover:opacity-100 ml-auto">Connect with me</span>
+            <span className="text-sm opacity-80 group-hover:opacity-100 md:ml-auto break-all sm:break-normal">Connect with me</span>
           </a>
           
-          {/* Resume Download Button (Styled slightly differently to stand out) */}
-          <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-4 p-4 border-4 border-[#5c4f4f] bg-[#c9d4d9] hover:bg-[#8f9ca6] hover:text-[#f4ece6] transition-all group mt-4 shadow-[4px_4px_0px_0px_rgba(92,79,79,0.3)] hover:translate-y-1 hover:shadow-none">
+          {/* Resume Download Button */}
+          <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-4 p-4 border-4 border-[#5c4f4f] bg-[#c9d4d9] hover:bg-[#8f9ca6] hover:text-[#f4ece6] transition-all group mt-4 shadow-[4px_4px_0px_0px_rgba(92,79,79,0.3)] hover:translate-y-1 hover:shadow-none text-center">
             <span className="font-bold uppercase tracking-wider text-[#2c2626] group-hover:text-[#f4ece6]">View Resume (404 WIP)</span>
           </a>
 

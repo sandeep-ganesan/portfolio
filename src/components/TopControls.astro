@@ -1,12 +1,12 @@
 ---
 // src/components/TopControls.astro
 ---
-<div class="fixed top-6 left-6 z-50 flex gap-4 pointer-events-auto">
+<div class="fixed top-4 left-4 md:top-6 md:left-6 z-50 flex gap-2 md:gap-4 pointer-events-auto">
   
 
   <button 
     id="music-toggle" 
-    class="w-12 h-12 bg-[#f4ece6] border-4 border-[#5c4f4f] flex items-center justify-center hover:-translate-y-1 transition-transform shadow-[4px_4px_0px_0px_rgba(92,79,79,0.3)] dark:bg-[#3e464f] dark:border-[#1a1e24] text-[#5c4f4f] dark:text-[#e4dcc6]"
+    class="w-10 h-10 md:w-12 md:h-12 bg-[#f4ece6] border-4 border-[#5c4f4f] flex items-center justify-center hover:-translate-y-1 transition-transform shadow-[4px_4px_0px_0px_rgba(92,79,79,0.3)] dark:bg-[#3e464f] dark:border-[#1a1e24] text-[#5c4f4f] dark:text-[#e4dcc6]"
     aria-label="Toggle Music"
   >
 
@@ -22,7 +22,7 @@
 
   <button 
     id="theme-toggle" 
-    class="w-12 h-12 bg-[#f4ece6] border-4 border-[#5c4f4f] flex items-center justify-center hover:-translate-y-1 transition-transform shadow-[4px_4px_0px_0px_rgba(92,79,79,0.3)] dark:bg-[#3e464f] dark:border-[#1a1e24] text-[#5c4f4f] dark:text-[#e4dcc6]"
+    class="w-10 h-10 md:w-12 md:h-12 bg-[#f4ece6] border-4 border-[#5c4f4f] flex items-center justify-center hover:-translate-y-1 transition-transform shadow-[4px_4px_0px_0px_rgba(92,79,79,0.3)] dark:bg-[#3e464f] dark:border-[#1a1e24] text-[#5c4f4f] dark:text-[#e4dcc6]"
     aria-label="Toggle Theme"
   >
 
@@ -35,7 +35,7 @@
     </svg>
   </button>
 
-  <audio id="bg-music" loop>
+  <audio id="bg-music" loop preload="none">
     <source src="/media/Gymnopedie-no-1.mp3" type="audio/mpeg">
   </audio>
 </div>
