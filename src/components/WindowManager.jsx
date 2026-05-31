@@ -271,7 +271,7 @@ function ProjectsContent() {
     },
     {
       id: 4,
-      title: "Retro OS Portfolio",
+      title: "Cozy Portfolio",
       category: "personal",
       stack: "Astro • React • Tailwind • Nanostores",
       description: "A highly interactive, custom-built portfolio website, featuring a fully functional window manager and retro aesthetics.",
