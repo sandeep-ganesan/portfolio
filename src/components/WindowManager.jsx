@@ -10,12 +10,17 @@ function DraggableWindow({ win, index }) {
   // Stagger new windows based on how many are open, adjusting for small browser sizes
   const [pos, setPos] = useState(() => {
     if (typeof window !== 'undefined') {
-      // NEW: Calculate a safe width/height that won't exceed the current browser size
       const safeWidth = Math.min(900, window.innerWidth * 0.95);
       const safeHeight = Math.min(750, window.innerHeight * 0.90);
       
-      const startX = Math.max(10, (window.innerWidth / 2) - (safeWidth / 2) + (index * 30));
-      const startY = Math.max(10, (window.innerHeight / 2) - (safeHeight / 2) + (index * 30));
+      // Create a random offset between -25px and +25px
+      const jitterX = Math.floor(Math.random() * 50) - 25;
+      const jitterY = Math.floor(Math.random() * 50) - 25;
+
+      // Shift base slightly up/left (-30), increase index cascade (+40), and apply jitter
+      const startX = Math.max(10, (window.innerWidth / 2) - (safeWidth / 2) - 30 + (index * 40) + jitterX);
+      const startY = Math.max(10, (window.innerHeight / 2) - (safeHeight / 2) - 30 + (index * 40) + jitterY);
+      
       return { x: startX, y: startY };
     }
     // Fallback just in case
