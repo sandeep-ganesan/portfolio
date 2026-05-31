@@ -1,0 +1,35 @@
+---
+const { id, title } = Astro.props;
+---
+
+<div 
+  class="desktop-icon flex flex-col items-center w-32 cursor-pointer group"
+  data-id={id}
+  data-title={title}
+>
+  
+  <div class="w-16 h-16 pointer-events-none transition-transform group-hover:-translate-y-2 text-[#5c4f4f] dark:text-[#e4dcc6] group-hover:text-[#d97373] dark:group-hover:text-[#d97373] transition-colors">
+    <slot name="icon" />
+  </div>
+  
+  <span class="text-[#5c4f4f] dark:text-[#e4dcc6] group-hover:text-[#d97373] dark:group-hover:text-[#d97373] transition-colors text-lg font-bold text-center drop-shadow-sm pointer-events-none mt-2">
+    {title}
+  </span>
+</div>
+
+<script>
+  import { openWindow } from '../store/windows.js';
+
+  const icons = document.querySelectorAll('.desktop-icon');
+  icons.forEach(icon => {
+    icon.addEventListener('click', (e) => {
+      const target = e.currentTarget as HTMLElement; 
+      const id = target.dataset.id;
+      const title = target.dataset.title;
+      
+      if (id && title) {
+        openWindow(id, title);
+      }
+    });
+  });
+</script>

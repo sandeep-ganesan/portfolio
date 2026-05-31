@@ -1,0 +1,32 @@
+---
+// src/components/Clock.astro
+---
+<div 
+  id="desktop-clock" 
+  class="text-7xl md:text-9xl font-bold text-[#5c4f4f] dark:text-[#e4dcc6] mb-8 cursor-pointer hover:text-[#d97373] dark:hover:text-[#d97373] transition-colors select-none drop-shadow-sm tracking-widest text-center pointer-events-auto"
+>
+  --:--
+</div>
+
+<script>
+  import { openWindow } from '../store/windows.js';
+
+  const clockEl = document.getElementById('desktop-clock');
+  
+  function updateClock() {
+    if (!clockEl) return;
+    const now = new Date();
+    clockEl.textContent = now.toLocaleTimeString([], {
+      timeZone: 'Asia/Tokyo', 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+  }
+  
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  clockEl?.addEventListener('click', () => {
+    openWindow('clock', 'Time.txt');
+  });
+</script>

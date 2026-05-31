@@ -1,0 +1,83 @@
+---
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="My Cozy OS Portfolio" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+
+    <script is:inline>
+      if (localStorage.getItem('theme') === 'light') {
+        document.documentElement.classList.remove('dark');
+      }
+    </script>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+
+    @import "tailwindcss";
+    
+  @custom-variant dark (&:is(.dark *));
+
+  :root {
+    /*Color Palette */
+    --os-bg: #c9d4d9;       /* Muted blue-grey desktop background */
+    --os-border: #5c4f4f;   /* Warm dark grey for chunky borders */
+    --os-window: #f4ece6;   /* Cream for window interiors */
+    --os-taskbar: #8f9ca6;  /* Soft grey-blue for taskbar */
+    --os-accent: #d97373;   /* Dusty rose for close buttons/accents */
+  }
+  
+  body {
+    margin: 0;
+    font-family: 'DotGothic16', sans-serif;
+    background-color: var(--os-bg);
+    
+    overflow: hidden; 
+    user-select: none; 
+  }
+
+  /* Force crisp pixels for all images and pixel art classes */
+  img, .pixel-art {
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+  }
+
+  ::-webkit-scrollbar {
+    width: 14px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--os-window);
+    border-left: 3px solid var(--os-border);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--os-taskbar);
+    border: 3px solid var(--os-border);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--os-accent);
+  }
+
+  .window-header {
+    touch-action: none;
+  }
+</style>
