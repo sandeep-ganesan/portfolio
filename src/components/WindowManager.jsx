@@ -268,6 +268,23 @@ function ProjectsContent() {
         ],
         architecture: "Collects real-time social media data, filtering it via BERTopic. Processed text undergoes sentiment analysis using a BERT model fine-tuned on political manifestos, then uses semantic algorithms to flag orientation shifts for VAA updates."
       }
+    },
+    {
+      id: 4,
+      title: "Retro OS Portfolio",
+      category: "personal",
+      stack: "Astro • React • Tailwind • Nanostores",
+      description: "A highly interactive, custom-built portfolio website, featuring a fully functional window manager and retro aesthetics.",
+      github: "https://github.com/sandeep-ganesan/portfolio", // Update this if your repo name is different!
+      details: {
+        features: [
+          "Custom React window manager with draggable bounds clamping",
+          "Simplistic design that is easy to navigate and mobile-friendly",
+          "Features background music and language options (WIP)",
+          "Global state management across UI components using Nanostores"
+        ],
+        architecture: "Built on an Astro foundation to ship zero-JavaScript static HTML by default. Interactive elements like the draggable windows and dock are injected as React 'Islands', utilizing Nanostores to share global state (like active windows and focus hierarchy) across isolated components."
+      }
     }
   ];
 
