@@ -4,20 +4,25 @@ import { openWindows, closeWindow, focusWindow } from '../store/windows';
 
 // 1. We create a custom component for an individual window
 function DraggableWindow({ win, index }) {
-  // Stagger new windows based on how many are open
+  // NEW: A ref to measure the window's actual physical size on screen
+  const windowRef = useRef(null);
+
+  // Stagger new windows based on how many are open, adjusting for small browser sizes
   const [pos, setPos] = useState(() => {
     if (typeof window !== 'undefined') {
-      const startX = (window.innerWidth / 2) - 500 + (index * 30);
-      const startY = (window.innerHeight / 2) - 450 + (index * 30);
+      // NEW: Calculate a safe width/height that won't exceed the current browser size
+      const safeWidth = Math.min(900, window.innerWidth * 0.95);
+      const safeHeight = Math.min(750, window.innerHeight * 0.90);
+      
+      const startX = Math.max(10, (window.innerWidth / 2) - (safeWidth / 2) + (index * 30));
+      const startY = Math.max(10, (window.innerHeight / 2) - (safeHeight / 2) + (index * 30));
       return { x: startX, y: startY };
     }
     // Fallback just in case
-    return { x: 100, y: 100 }; 
+    return { x: 10, y: 10 }; 
   });
-  const [isDragging, setIsDragging] = useState(false);
   
-  // We use a ref to track exactly where on the header you clicked, 
-  // so the window doesn't snap to the top-left of your mouse.
+  const [isDragging, setIsDragging] = useState(false);
   const dragOffset = useRef({ x: 0, y: 0 });
 
   const handlePointerDown = (e) => {
@@ -26,24 +31,25 @@ function DraggableWindow({ win, index }) {
       x: e.clientX - pos.x,
       y: e.clientY - pos.y,
     };
-    // This crucial line keeps it dragging even if your mouse moves fast!
     e.target.setPointerCapture(e.pointerId); 
   };
 
   const handlePointerMove = (e) => {
-    if (!isDragging) return;
+    // NEW: Ensure we have a reference to the window element before moving
+    if (!isDragging || !windowRef.current) return;
 
     let newX = e.clientX - dragOffset.current.x;
     let newY = e.clientY - dragOffset.current.y;
 
-    const winWidth = 900;
-    const titleBarHeight = 40; // Approximate height of your header
-    const minVisibleX = 100; // Require at least 100px of the header to stay on screen horizontally
+    // NEW: Read the actual dynamically resized width of the window instead of hardcoding 900
+    const winWidth = windowRef.current.offsetWidth;
+    const titleBarHeight = 40; 
+    const minVisibleX = 100; 
 
-    // 1. Horizontal Clamp:
+    // Horizontal Clamp
     newX = Math.max(-winWidth + minVisibleX, Math.min(newX, window.innerWidth - minVisibleX));
     
-    // 2. Vertical Clamp: 
+    // Vertical Clamp
     newY = Math.max(0, Math.min(newY, window.innerHeight - titleBarHeight));
 
     setPos({ x: newX, y: newY });
@@ -56,12 +62,14 @@ function DraggableWindow({ win, index }) {
 
   return (
     <div 
-    onPointerDown={() => focusWindow(win.id)}
-      className="absolute flex flex-col bg-[#f4ece6] z-50 pointer-events-auto max-md:!left-0 max-md:!top-0 max-md:!w-full max-md:!h-[100dvh] max-md:border-none max-md:shadow-none border-4 border-[#5c4f4f] shadow-[8px_8px_0px_0px_rgba(92,79,79,0.3)] w-[900px] h-[750px] max-w-full"
+      ref={windowRef}
+      onPointerDown={() => focusWindow(win.id)}
+      // NEW: Added max-w-[95vw] and max-h-[90vh] so the window shrinks on smaller monitors
+      className="absolute flex flex-col bg-[#f4ece6] pointer-events-auto max-md:!left-0 max-md:!top-0 max-md:!w-full max-md:!h-[100dvh] max-md:border-none max-md:shadow-none border-4 border-[#5c4f4f] shadow-[8px_8px_0px_0px_rgba(92,79,79,0.3)] w-[900px] h-[750px] max-w-[95vw] max-h-[90vh]"
       style={{ 
         left: pos.x, 
         top: pos.y, 
-        zIndex: win.zIndex || 10 
+        zIndex: 100 + (win.zIndex || 0) 
       }}
     >
       {/* --- THE DRAG HANDLE (HEADER) --- */}
@@ -75,7 +83,7 @@ function DraggableWindow({ win, index }) {
           {win.title}
         </span>
         <button 
-          onPointerDown={(e) => e.stopPropagation()} // Prevents dragging when clicking close
+          onPointerDown={(e) => e.stopPropagation()} 
           onClick={() => closeWindow(win.id)}
           className="text-[#2c2626] hover:text-[#d97373] font-bold cursor-default transition-transform hover:scale-110 text-lg md:text-base px-2"
         >
@@ -89,9 +97,8 @@ function DraggableWindow({ win, index }) {
         {win.id === 'about' && (
           <div className="flex flex-col gap-4 h-full overflow-y-auto md:pr-2 pb-12 pointer-events-auto">
             
-            {/* Top Profile Header - Now stacks on mobile using flex-col md:flex-row */}
+            {/* Top Profile Header */}
             <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-6 border-b-4 border-[#8f9ca6] pb-6">
-              {/* Profile Picture Placeholder */}
               <div className="w-48 h-48 md:w-64 md:h-64 bg-[#c9d4d9] border-4 border-[#5c4f4f] flex-shrink-0 shadow-[4px_4px_0px_0px_rgba(92,79,79,0.2)]">
                 <img src="media/bk_pic.png" alt="Profile" className="w-full h-full object-cover pixel-art" />
               </div>
@@ -114,32 +121,32 @@ function DraggableWindow({ win, index }) {
               </p>
 
               <div>
-            <h3 className="text-xl font-bold text-[#d97373] border-b-2 border-[#d97373]/30 inline-block mb-2">
-              Education
-            </h3>
-            <p>
-              B.Engg. in Information Systems Science and Engineering, <strong>Ritsumeikan University</strong>, Expected Graduation: <strong>2028</strong>
-            </p>
-          </div>
-          <div>
-            <h3 className="text-xl font-bold text-[#d97373] border-b-2 border-[#d97373]/30 inline-block mb-2">
-              Other Interests
-            </h3>
-            <ul className="list-disc list-inside space-y-1">
-              <li><strong>Gaming:</strong> I like to play some video games in my free time. Current favorite is <em>Rainbow Six Siege</em>.</li>
-              <li><strong>Drawing silly art:</strong> I draw silly art when I am bored. The current profile picture is something I drew.</li>
-            </ul>
-          </div>
+                <h3 className="text-xl font-bold text-[#d97373] border-b-2 border-[#d97373]/30 inline-block mb-2">
+                  Education
+                </h3>
+                <p>
+                  B.Engg. in Information Systems Science and Engineering, <strong>Ritsumeikan University</strong>, Expected Graduation: <strong>2028</strong>
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-[#d97373] border-b-2 border-[#d97373]/30 inline-block mb-2">
+                  Other Interests
+                </h3>
+                <ul className="list-disc list-inside space-y-1">
+                  <li><strong>Gaming:</strong> I like to play some video games in my free time. Current favorite is <em>Rainbow Six Siege</em>.</li>
+                  <li><strong>Drawing silly art:</strong> I draw silly art when I am bored. The current profile picture is something I drew.</li>
+                </ul>
+              </div>
             </div>
 
             <div>
-            <h3 className="text-xl font-bold text-[#d97373] border-b-2 border-[#d97373]/30 inline-block mb-2">
-              Language Proficiency
-            </h3>
-            <p>
-              I am fluent in English and Tamil and have conversational proficiency in Japanese.
-            </p>
-          </div>
+              <h3 className="text-xl font-bold text-[#d97373] border-b-2 border-[#d97373]/30 inline-block mb-2">
+                Language Proficiency
+              </h3>
+              <p>
+                I am fluent in English and Tamil and have conversational proficiency in Japanese.
+              </p>
+            </div>
 
           </div>
         )}
@@ -185,13 +192,13 @@ function DraggableWindow({ win, index }) {
                   <span>DotGothic16 via Google Fonts</span>
                 </li>
                 <li className="flex flex-col">
-  <span className="font-bold text-[#d97373]">Icons</span>
-  <span>
-    <a href="https://fonts.google.com/icons" target="_blank" rel="noopener noreferrer" className="hover:underline">
-      Material Design Icons by Google
-    </a>
-  </span>
-</li>
+                  <span className="font-bold text-[#d97373]">Icons</span>
+                  <span>
+                    <a href="https://fonts.google.com/icons" target="_blank" rel="noopener noreferrer" className="hover:underline">
+                      Material Design Icons by Google
+                    </a>
+                  </span>
+                </li>
               </ul>
             </div>
           </div>
