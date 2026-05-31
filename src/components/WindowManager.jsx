@@ -7,8 +7,8 @@ function DraggableWindow({ win, index }) {
   // Stagger new windows based on how many are open
   const [pos, setPos] = useState(() => {
     if (typeof window !== 'undefined') {
-      const startX = (window.innerWidth / 2) - 900 + (index * 30);
-      const startY = (window.innerHeight / 2) - 450 + (index * 30);
+      const startX = (window.innerWidth / 2) - 450 + (index * 30);
+      const startY = (window.innerHeight / 2) - 375 + (index * 30);
       return { x: startX, y: startY };
     }
     // Fallback just in case
@@ -57,7 +57,7 @@ function DraggableWindow({ win, index }) {
   return (
     <div 
     onPointerDown={() => focusWindow(win.id)}
-      className="absolute flex flex-col w-[900px] h-[750px] bg-[#f4ece6] border-4 border-[#5c4f4f] shadow-[8px_8px_0px_0px_rgba(92,79,79,0.3)]"
+      className="absolute flex flex-col bg-[#f4ece6] z-50 pointer-events-auto max-md:!left-0 max-md:!top-0 max-md:!w-full max-md:!h-[100dvh] max-md:border-none max-md:shadow-none border-4 border-[#5c4f4f] shadow-[8px_8px_0px_0px_rgba(92,79,79,0.3)] w-[900px] h-[750px] max-w-full"
       style={{ 
         left: pos.x, 
         top: pos.y, 
@@ -69,7 +69,7 @@ function DraggableWindow({ win, index }) {
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
-        className="bg-[#8f9ca6] text-[#2c2626] px-3 py-2 flex justify-between items-center border-b-4 border-[#5c4f4f] cursor-default select-none touch-none"
+        className="bg-[#8f9ca6] text-[#2c2626] px-3 py-2 flex justify-between items-center border-b-4 border-[#5c4f4f] cursor-default select-none touch-none max-md:py-3"
       >
         <span className="font-bold tracking-widest text-sm uppercase pointer-events-none">
           {win.title}
@@ -77,23 +77,23 @@ function DraggableWindow({ win, index }) {
         <button 
           onPointerDown={(e) => e.stopPropagation()} // Prevents dragging when clicking close
           onClick={() => closeWindow(win.id)}
-          className="text-[#2c2626] hover:text-[#d97373] font-bold cursor-default transition-transform hover:scale-110"
+          className="text-[#2c2626] hover:text-[#d97373] font-bold cursor-default transition-transform hover:scale-110 text-lg md:text-base px-2"
         >
           [X]
         </button>
       </div>
 
       {/* --- THE WINDOW CONTENT --- */}
-      <div className="flex-1 p-6 overflow-y-auto text-[#5c4f4f] leading-relaxed cursor-auto">
+      <div className="flex-1 p-4 md:p-6 overflow-y-auto text-[#5c4f4f] leading-relaxed cursor-auto">
         
         {win.id === 'about' && (
-          <div className="flex flex-col gap-4 h-full overflow-y-auto pr-2 pb-12 pointer-events-auto">
+          <div className="flex flex-col gap-4 h-full overflow-y-auto md:pr-2 pb-12 pointer-events-auto">
             
-            {/* Top Profile Header */}
-            <div className="flex items-center gap-6 border-b-4 border-[#8f9ca6] pb-6">
+            {/* Top Profile Header - Now stacks on mobile using flex-col md:flex-row */}
+            <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-6 border-b-4 border-[#8f9ca6] pb-6">
               {/* Profile Picture Placeholder */}
-              <div className="w-48 h-48 bg-[#c9d4d9] border-4 border-[#5c4f4f] flex-shrink-0 shadow-[4px_4px_0px_0px_rgba(92,79,79,0.2)]">
-  <img src="media/bk_pic.png" alt="Profile" className="w-full h-full object-cover pixel-art" />
+              <div className="w-48 h-48 md:w-64 md:h-64 bg-[#c9d4d9] border-4 border-[#5c4f4f] flex-shrink-0 shadow-[4px_4px_0px_0px_rgba(92,79,79,0.2)]">
+                <img src="media/bk_pic.png" alt="Profile" className="w-full h-full object-cover pixel-art" />
               </div>
               <div>
                 <h2 className="text-3xl font-bold tracking-widest text-[#2c2626]">Sandeep Ganesan</h2>
@@ -177,7 +177,7 @@ function DraggableWindow({ win, index }) {
                 
                 <li className="flex flex-col">
                   <span className="font-bold text-[#d97373]">Music</span>
-                  <span><a href="https://incompetech.com/" target="_blank" rel="noopener noreferrer" className="hover:underline">Gymnopedie No. 1 by Erik Satie (performed by Kevin MacLeod)</a></span>
+                  <span><a href="https://incompetech.com/" target="_blank" rel="noopener noreferrer" className="hover:underline break-all sm:break-normal">Gymnopedie No. 1 by Erik Satie (performed by Kevin MacLeod)</a></span>
                 </li>
 
                 <li className="flex flex-col">
@@ -242,7 +242,6 @@ function ProjectsContent() {
       }
     },
     {
-      // NEW SCHOOL PROJECT ADDED HERE
       id: 3,
       title: "Dynamic VAA Updater",
       category: "school",
@@ -265,7 +264,7 @@ function ProjectsContent() {
     : projects.filter(p => p.category === filter);
 
   return (
-    <div className="flex flex-col gap-4 h-full overflow-y-auto pr-2 pb-12 pointer-events-auto">
+    <div className="flex flex-col gap-4 h-full overflow-y-auto md:pr-2 pb-12 pointer-events-auto">
       
       {/* The Main Header */}
       <h2 className="text-3xl font-bold tracking-widest text-[#2c2626] uppercase border-b-4 border-[#8f9ca6] pb-4 sticky top-0 bg-[#f4ece6] z-10 pt-2">
@@ -273,7 +272,7 @@ function ProjectsContent() {
       </h2>
       
       {/* The Filter Buttons */}
-      <div className="flex gap-4">
+      <div className="flex flex-wrap gap-3 md:gap-4">
         <button
           onClick={() => setFilter('all')}
           className={`px-4 py-2 border-4 border-[#5c4f4f] font-bold transition-transform shadow-[4px_4px_0px_0px_rgba(92,79,79,0.3)] 
@@ -303,7 +302,7 @@ function ProjectsContent() {
            <div key={project.id} className="border-4 border-[#5c4f4f] bg-[#e4dcc6] flex flex-col shadow-[4px_4px_0px_0px_rgba(92,79,79,0.2)]">
              
              {/* Card Header */}
-             <div className="p-4 border-b-4 border-[#5c4f4f] bg-[#c9d4d9] flex justify-between items-start">
+             <div className="p-4 border-b-4 border-[#5c4f4f] bg-[#c9d4d9] flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
                <div>
                  <h3 className="font-bold text-2xl text-[#2c2626] tracking-wide">{project.title}</h3>
                  <span className="text-sm font-bold text-[#d97373]">{project.stack}</span>
@@ -362,7 +361,7 @@ function ProjectsContent() {
 // A dedicated component for the Contact window
 function ContactContent() {
   return (
-    <div className="flex flex-col gap-4 h-full overflow-y-auto pr-2 pb-12 pointer-events-auto">
+    <div className="flex flex-col gap-4 h-full overflow-y-auto md:pr-2 pb-12 pointer-events-auto">
       
       {/* The Main Header */}
       <h2 className="text-3xl font-bold tracking-widest text-[#2c2626] uppercase border-b-4 border-[#8f9ca6] pb-4">
@@ -380,23 +379,23 @@ function ContactContent() {
         {/* The Contact Links */}
         <div className="flex flex-col gap-4 mt-6">
           
-          <a href="mailto:placeholder@wip.com" className="flex items-center gap-4 p-4 border-4 border-[#5c4f4f] bg-[#e4dcc6] hover:bg-[#d97373] hover:text-[#f4ece6] transition-colors group">
+          <a href="mailto:placeholder@wip.com" className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4 p-4 border-4 border-[#5c4f4f] bg-[#e4dcc6] hover:bg-[#d97373] hover:text-[#f4ece6] transition-colors group">
             <span className="font-bold uppercase tracking-wider">Email</span>
-            <span className="text-sm opacity-80 group-hover:opacity-100 ml-auto">placeholder@wip.com</span>
+            <span className="text-sm opacity-80 group-hover:opacity-100 md:ml-auto break-all sm:break-normal">placeholder@wip.com</span>
           </a>
 
-          <a href="https://github.com/sandeep-ganesan" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 p-4 border-4 border-[#5c4f4f] bg-[#e4dcc6] hover:bg-[#d97373] hover:text-[#f4ece6] transition-colors group">
+          <a href="https://github.com/sandeep-ganesan" target="_blank" rel="noopener noreferrer" className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4 p-4 border-4 border-[#5c4f4f] bg-[#e4dcc6] hover:bg-[#d97373] hover:text-[#f4ece6] transition-colors group">
             <span className="font-bold uppercase tracking-wider">GitHub</span>
-            <span className="text-sm opacity-80 group-hover:opacity-100 ml-auto">@sandeep-ganesan</span>
+            <span className="text-sm opacity-80 group-hover:opacity-100 md:ml-auto break-all sm:break-normal">@sandeep-ganesan</span>
           </a>
 
-          <a href="https://linkedin.com/in/sandeep-ganesan-7ab40b366" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 p-4 border-4 border-[#5c4f4f] bg-[#e4dcc6] hover:bg-[#d97373] hover:text-[#f4ece6] transition-colors group">
+          <a href="https://linkedin.com/in/sandeep-ganesan-7ab40b366" target="_blank" rel="noopener noreferrer" className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4 p-4 border-4 border-[#5c4f4f] bg-[#e4dcc6] hover:bg-[#d97373] hover:text-[#f4ece6] transition-colors group">
             <span className="font-bold uppercase tracking-wider">LinkedIn</span>
-            <span className="text-sm opacity-80 group-hover:opacity-100 ml-auto">Connect with me</span>
+            <span className="text-sm opacity-80 group-hover:opacity-100 md:ml-auto break-all sm:break-normal">Connect with me</span>
           </a>
           
-          {/* Resume Download Button (Styled slightly differently to stand out) */}
-          <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-4 p-4 border-4 border-[#5c4f4f] bg-[#c9d4d9] hover:bg-[#8f9ca6] hover:text-[#f4ece6] transition-all group mt-4 shadow-[4px_4px_0px_0px_rgba(92,79,79,0.3)] hover:translate-y-1 hover:shadow-none">
+          {/* Resume Download Button */}
+          <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-4 p-4 border-4 border-[#5c4f4f] bg-[#c9d4d9] hover:bg-[#8f9ca6] hover:text-[#f4ece6] transition-all group mt-4 shadow-[4px_4px_0px_0px_rgba(92,79,79,0.3)] hover:translate-y-1 hover:shadow-none text-center">
             <span className="font-bold uppercase tracking-wider text-[#2c2626] group-hover:text-[#f4ece6]">View Resume (404 WIP)</span>
           </a>
 
