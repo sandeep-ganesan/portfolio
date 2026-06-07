@@ -1,11 +1,11 @@
 import { useState, useRef } from 'react';
 import { useStore } from '@nanostores/react';
 import { openWindows, closeWindow, focusWindow } from '../store/windows';
+import { currentLang } from '../store/locale';
 
-// 1. We create a custom component for an individual window
 function DraggableWindow({ win, index }) {
-  // NEW: A ref to measure the window's actual physical size on screen
   const windowRef = useRef(null);
+  const lang = useStore(currentLang);
 
   // Stagger new windows based on how many are open, adjusting for small browser sizes
   const [pos, setPos] = useState(() => {
@@ -85,7 +85,13 @@ function DraggableWindow({ win, index }) {
         className="bg-[#8f9ca6] text-[#2c2626] px-3 py-2 flex justify-between items-center border-b-4 border-[#5c4f4f] cursor-default select-none touch-none max-md:py-3"
       >
         <span className="font-bold tracking-widest text-sm uppercase pointer-events-none">
-          {win.title}
+          {lang === 'en' 
+            ? win.title 
+              : (win.id === 'about' ? '自己紹介' 
+              : win.id === 'projects' ? 'プロジェクト' 
+              : win.id === 'contact' ? '連絡先' 
+              : win.id === 'credits' ? 'クレジット' 
+              : win.title)}
         </span>
         <button 
           onPointerDown={(e) => e.stopPropagation()} 
@@ -108,48 +114,48 @@ function DraggableWindow({ win, index }) {
                 <img src="media/bk_pic.png" alt="Profile" className="w-full h-full object-cover pixel-art" />
               </div>
               <div>
-                <h2 className="text-3xl font-bold tracking-widest text-[#2c2626]">Sandeep Ganesan</h2>
-                <p className="text-[#d97373] font-bold text-lg mt-1">University Student and Freelance Developer</p>
+                <h2 className="text-3xl font-bold tracking-widest text-[#2c2626]">{lang === 'en' ? 'Sandeep Ganesan' : 'サンディープ　ガネーサン'}</h2>
+                <p className="text-[#d97373] font-bold text-lg mt-1">{lang === 'en' ? 'University Student and Freelance Developer' : '大学生とフリーランス開発者'}</p>
               </div>
             </div>
 
             {/* Bio Content Area */}
             <div className="space-y-5 text-lg">
               <p>
-                Hello! I'm a third-year university student currently based in Japan. 
+                {lang === 'en' ? 'Hello! I\'m a third-year university student currently based in Japan. ' : 'こんにちは！私は日本に住んでいる三年生の大学生です。'}
               </p>
               <p>
-                I'm passionate about creating engaging digital experiences, whether that's through building interactive web applications or solving real-world problems through mobile applications. I also love dabbling in AI, NLP and robotics.
+                {lang === 'en' ? 'I\'m passionate about creating engaging digital experiences, whether that\'s through building interactive web applications or solving real-world problems through mobile applications. I also love dabbling in AI, NLP and robotics.' : 'インタラクティブなウェブアプリの開発や、モバイルアプリを通じた実社会の課題解決に情熱を持っています。また、AI、自然言語処理（NLP）、ロボティクスにも興味があります。'}
               </p>
               <p>
-                My current technical focuses include creating mobile applications using Flutter and React. I also use ROS2 for my robotics projects.
+                {lang === 'en' ? 'My current technical focuses include creating mobile applications using Flutter and React. I also use ROS2 for my robotics projects.' : '現在は、FlutterとReactを使ってモバイルアプリを作ることに力を入れています。また、ロボットのプロジェクトではROS2も使っています。'}
               </p>
 
               <div>
                 <h3 className="text-xl font-bold text-[#d97373] border-b-2 border-[#d97373]/30 inline-block mb-2">
-                  Education
+                  {lang === 'en' ? 'Education' : '学歴'}
                 </h3>
                 <p>
-                  B.Engg. in Information Systems Science and Engineering, <strong>Ritsumeikan University</strong>, Expected Graduation: <strong>2028</strong>
+                  {lang === 'en' ? (<>B.Engg. in Information Systems Science and Engineering, <strong>Ritsumeikan University</strong>, Expected Graduation: <strong>2028</strong></>) : (<><strong>立命館大学</strong> 情報理工学部 在学中、<strong>2028</strong>年卒業見込み</>)}
                 </p>
               </div>
               <div>
                 <h3 className="text-xl font-bold text-[#d97373] border-b-2 border-[#d97373]/30 inline-block mb-2">
-                  Other Interests
+                  {lang === 'en' ? 'Other Interests' : '興味・関心'}
                 </h3>
                 <ul className="list-disc list-inside space-y-1">
-                  <li><strong>Gaming:</strong> I like to play some video games in my free time. Current favorite is <em>Rainbow Six Siege</em>.</li>
-                  <li><strong>Drawing silly art:</strong> I draw silly art when I am bored. The current profile picture is something I drew.</li>
+                  <li>{lang === 'en' ? (<><strong>Gaming:</strong> I like to play some video games in my free time. Current favorite is <em>Rainbow Six Siege</em>.</>) : (<><strong>ゲーム:</strong> 余暇にはゲームをすることが多いです。最近は<em>レインボーシックス シージ</em>をよくプレイしています。</>)}</li>
+                  <li>{lang === 'en' ? (<><strong>Drawing silly art:</strong> I draw silly art when I am bored. The current profile picture is something I drew.</>) : (<><strong>イラスト:</strong> 暇なときに、ゆるい感じのイラストを描きます。現在のプロフィール画像も自分で描いたものです。</>)}</li>
                 </ul>
               </div>
             </div>
 
             <div>
               <h3 className="text-xl font-bold text-[#d97373] border-b-2 border-[#d97373]/30 inline-block mb-2">
-                Language Proficiency
+                {lang === 'en' ? 'Language Proficiency' : '語学力'}
               </h3>
               <p>
-                I am fluent in English and Tamil and have conversational proficiency in Japanese.
+                {lang === 'en' ? 'I am fluent in English and Tamil and have conversational proficiency in Japanese.' : '英語とタミル語は流暢に話すことができます。日本語は日常会話ができます。'}
               </p>
             </div>
 
@@ -173,34 +179,34 @@ function DraggableWindow({ win, index }) {
         {win.id === 'credits' && (
           <div className="flex flex-col gap-4 h-full">
             <h2 className="text-3xl font-bold tracking-widest text-[#2c2626] uppercase border-b-4 border-[#8f9ca6] pb-4">
-              Credits & Resources
+              {lang === 'en' ? 'Credits & Resources' : 'クレジットと参考資料'}
             </h2>
             
             <div className="space-y-6 text-lg mt-2">
               <p>
-                A huge thank you to the creators, developers, and artists whose tools and inspiration made this portfolio possible:
+                {lang === 'en' ? 'A huge thank you to the creators, developers, and artists whose tools and inspiration made this portfolio possible:' : 'このポートフォリオを作るのに協力してくれたクリエイター、開発者、アーティストに感謝します。'}
               </p>
               
               <ul className="space-y-4">
                 <li className="flex flex-col">
-                  <span className="font-bold text-[#d97373]">Design Inspiration</span>
-                  <span><a href="https://www.sharyap.com/" target="_blank" rel="noopener noreferrer" className="hover:underline">Sharlene Yap's Website</a></span>
+                  <span className="font-bold text-[#d97373]">{lang === 'en' ? 'Design Inspiration' : 'デザインのインスピレーション'}</span>
+                  <span><a href="https://www.sharyap.com/" target="_blank" rel="noopener noreferrer" className="hover:underline">{lang === 'en' ? "Sharlene Yap's Website" : "Sharlene Yapのホームページ"}</a></span>
                 </li>
                 
                 <li className="flex flex-col">
-                  <span className="font-bold text-[#d97373]">Music</span>
-                  <span><a href="https://incompetech.com/" target="_blank" rel="noopener noreferrer" className="hover:underline break-all sm:break-normal">Gymnopedie No. 1 by Erik Satie (performed by Kevin MacLeod)</a></span>
+                  <span className="font-bold text-[#d97373]">{lang === 'en' ? 'Music' : '音楽'}</span>
+                  <span><a href="https://incompetech.com/" target="_blank" rel="noopener noreferrer" className="hover:underline break-all sm:break-normal">{lang === 'en' ? "Gymnopedie No. 1 by Erik Satie (performed by Kevin MacLeod)" : "エリック・サティ作『ギュモペディー第1番』（ケビン・マクレオド演奏）"}</a></span>
                 </li>
 
                 <li className="flex flex-col">
-                  <span className="font-bold text-[#d97373]">Typography</span>
-                  <span>DotGothic16 via Google Fonts</span>
+                  <span className="font-bold text-[#d97373]">{lang === 'en' ? 'Typography' : 'タイポグラフィ'}</span>
+                  <span>{lang === 'en' ? "DotGothic16 via Google Fonts" : "Google FontsのDotGothic16"}</span>
                 </li>
                 <li className="flex flex-col">
-                  <span className="font-bold text-[#d97373]">Icons</span>
+                  <span className="font-bold text-[#d97373]">{lang === 'en' ? 'Icons' : 'アイコン'}</span>
                   <span>
                     <a href="https://fonts.google.com/icons" target="_blank" rel="noopener noreferrer" className="hover:underline">
-                      Material Design Icons by Google
+                      {lang === 'en' ? "Material Design Icons by Google" : "GoogleのMaterial Design Icons"}
                     </a>
                   </span>
                 </li>
@@ -217,6 +223,7 @@ function DraggableWindow({ win, index }) {
 // A dedicated component just for the Projects window to handle its own filter state
 function ProjectsContent() {
   const [filter, setFilter] = useState('all');
+  const lang = useStore(currentLang);
 
   const projects = [
     {
@@ -297,7 +304,7 @@ function ProjectsContent() {
       
       {/* The Main Header */}
       <h2 className="text-3xl font-bold tracking-widest text-[#2c2626] uppercase border-b-4 border-[#8f9ca6] pb-4 sticky top-0 bg-[#f4ece6] z-10 pt-2">
-        Projects
+        {lang === 'en' ? 'Projects' : 'プロジェクト (日本語ーWIP)'}
       </h2>
       
       {/* The Filter Buttons */}
@@ -389,27 +396,35 @@ function ProjectsContent() {
 
 // A dedicated component for the Contact window
 function ContactContent() {
+
+  const lang = useStore(currentLang);
   return (
     <div className="flex flex-col gap-4 h-full overflow-y-auto md:pr-2 pb-12 pointer-events-auto">
       
       {/* The Main Header */}
       <h2 className="text-3xl font-bold tracking-widest text-[#2c2626] uppercase border-b-4 border-[#8f9ca6] pb-4">
-        Contact
+        {lang === 'en' ? 'Contact' : '連絡先'}
       </h2>
 
       <div className="space-y-6 text-[#5c4f4f] text-lg mt-2">
         <p>
-          The easiest way to reach me is through email, but feel free to connect with me on GitHub or LinkedIn as well! I don't use much of social media so LinkedIn or Email would be preffered.
-          </p>
+          {lang === 'en' 
+            ? "The easiest way to reach me is through email, but feel free to connect with me on GitHub or LinkedIn as well! I don't use much of social media so LinkedIn or Email would be preferred." 
+            : "連絡はメールが一番簡単です。GitHubやLinkedInでも気軽に連絡してください。SNSはあまり使わないので、メールかLinkedInのほうがありがたいです。"
+          }
+        </p>
         <p className="font-bold text-[#d97373]">
-          I am currently looking for internship opportunities and open-source collaborations.
+          {lang === 'en' 
+            ? "I am currently looking for internship opportunities and collaborations." 
+            : "現在、インターンシップの機会やコラボレーションを探しています。"
+          }
         </p>
 
         {/* The Contact Links */}
         <div className="flex flex-col gap-4 mt-6">
           
           <a href="mailto:hi@sandeepganesan.com" className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4 p-4 border-4 border-[#5c4f4f] bg-[#e4dcc6] hover:bg-[#d97373] hover:text-[#f4ece6] transition-colors group">
-            <span className="font-bold uppercase tracking-wider">Email</span>
+            <span className="font-bold uppercase tracking-wider">{lang === 'en' ? 'Email' : 'メール'}</span>
             <span className="text-sm opacity-80 group-hover:opacity-100 md:ml-auto break-all sm:break-normal">hi@sandeepganesan.com</span>
           </a>
 
@@ -425,7 +440,7 @@ function ContactContent() {
           
           {/* Resume Download Button */}
           <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-4 p-4 border-4 border-[#5c4f4f] bg-[#c9d4d9] hover:bg-[#8f9ca6] hover:text-[#f4ece6] transition-all group mt-4 shadow-[4px_4px_0px_0px_rgba(92,79,79,0.3)] hover:translate-y-1 hover:shadow-none text-center">
-            <span className="font-bold uppercase tracking-wider text-[#2c2626] group-hover:text-[#f4ece6]">View Resume (404 WIP)</span>
+            <span className="font-bold uppercase tracking-wider text-[#2c2626] group-hover:text-[#f4ece6]">{lang === 'en' ? 'View Resume (404 WIP)' : '履歴書 (404 WIP)'}</span>
           </a>
 
         </div>

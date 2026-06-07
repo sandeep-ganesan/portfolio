@@ -1,5 +1,5 @@
 ---
-const { id, title } = Astro.props;
+const { id, title, titleJa } = Astro.props;
 ---
 
 <div 
@@ -12,9 +12,9 @@ const { id, title } = Astro.props;
     <slot name="icon" />
   </div>
   
-  <span class="text-[#5c4f4f] dark:text-[#e4dcc6] group-hover:text-[#d97373] dark:group-hover:text-[#d97373] transition-colors text-lg font-bold text-center drop-shadow-sm pointer-events-none mt-2">
-    {title}
-  </span>
+<span class="lang-swap text-[#5c4f4f] dark:text-[#e4dcc6] group-hover:text-[#d97373] dark:group-hover:text-[#d97373] transition-colors text-lg font-bold text-center drop-shadow-sm pointer-events-none mt-2" data-en={title} data-ja={titleJa}>
+  {title}
+</span>
 </div>
 
 <script>
