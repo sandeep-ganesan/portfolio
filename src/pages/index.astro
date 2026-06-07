@@ -10,9 +10,11 @@ import Icons from '../components/Icons.astro';
 
 const country = Astro.request.headers.get('x-vercel-ip-country') || 'US';
 const initialLang = country === 'JP' ? 'ja' : 'en';
+
+const pageTitle = initialLang === 'ja' ? 'サンディープ | ポートフォリオ' : 'Sandeep | Portfolio';
 ---
 
-<Layout title="Sandeep | Portfolio">
+<Layout title={pageTitle}>
   
   <main class="h-screen w-screen overflow-hidden relative bg-[#c9d4d9] dark:bg-[#2d3238] transition-colors duration-500 p-4 flex flex-col justify-center items-center">
     
@@ -72,6 +74,7 @@ const initialLang = country === 'JP' ? 'ja' : 'en';
   const translatableElements = document.querySelectorAll('.lang-swap');
 
   currentLang.subscribe((lang) => {
+    document.title = lang === 'en' ? 'Sandeep | Portfolio' : 'サンディープ | ポートフォリオ';
     translatableElements.forEach((el) => {
       if (el instanceof HTMLElement) {
         el.textContent = lang === 'en' ? el.dataset.en : el.dataset.ja;
