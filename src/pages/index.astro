@@ -12,9 +12,12 @@ const country = Astro.request.headers.get('x-vercel-ip-country') || 'US';
 const initialLang = country === 'JP' ? 'ja' : 'en';
 
 const pageTitle = initialLang === 'ja' ? 'サンディープ | ポートフォリオ' : 'Sandeep | Portfolio';
+const pageDesc = initialLang === 'ja' 
+  ? 'サンディープ・ガネーサンのパーソナルポートフォリオ。プロジェクトや連絡先を掲載しています。' 
+  : "Sandeep Ganesan's personal portfolio, featuring projects and contact information.";
 ---
 
-<Layout title={pageTitle}>
+<Layout title={pageTitle} description={pageDesc}>
   
   <main class="h-screen w-screen overflow-hidden relative bg-[#c9d4d9] dark:bg-[#2d3238] transition-colors duration-500 p-4 flex flex-col justify-center items-center">
     
