@@ -10,20 +10,44 @@
 
 <script>
   import { openWindow } from '../store/windows.js';
+  import { currentLang } from '../store/locale.js';
 
   const clockEl = document.getElementById('desktop-clock');
+  let currentLocale = 'en-US';
   
   function updateClock() {
     if (!clockEl) return;
     const now = new Date();
-    clockEl.textContent = now.toLocaleTimeString([], {
-      timeZone: 'Asia/Tokyo', 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Asia/Tokyo',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: false
     });
+    
+    const timeParts = formatter.format(now).split(':');
+    const hour24 = parseInt(timeParts[0], 10);
+    const minute = timeParts[1];
+
+    const isPM = hour24 >= 12;
+    let hour12 = hour24 % 12;
+    if (hour12 === 0) hour12 = 12; // Handles midnight and noon
+
+    if (currentLocale === 'ja-JP') {
+      const ampm = isPM ? '午後' : '午前';
+      clockEl.textContent = `${ampm}${hour12}時${minute}分`;
+    } else {
+      const ampmEn = isPM ? 'PM' : 'AM';
+      clockEl.textContent = `${hour12}:${minute} ${ampmEn}`;
+    }
   }
   
-  updateClock();
+  currentLang.subscribe((lang) => {
+    currentLocale = lang === 'en' ? 'en-US' : 'ja-JP';
+    updateClock(); 
+  });
+  
   setInterval(updateClock, 1000);
 
   clockEl?.addEventListener('click', () => {
