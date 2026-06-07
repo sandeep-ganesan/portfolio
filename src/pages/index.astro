@@ -7,12 +7,17 @@ import LanguageToggle from '../components/LanguageToggle.astro';
 
 import FallingSakura from '../components/FallingSakura.jsx';
 import Icons from '../components/Icons.astro';
+
+const country = Astro.request.headers.get('x-vercel-ip-country') || 'US';
+const initialLang = country === 'JP' ? 'ja' : 'en';
 ---
 
 <Layout title="Sandeep | Portfolio">
   
   <main class="h-screen w-screen overflow-hidden relative bg-[#c9d4d9] dark:bg-[#2d3238] transition-colors duration-500 p-4 flex flex-col justify-center items-center">
     
+    <main id="desktop-environment" data-ip-lang={initialLang} class="h-screen w-screen overflow-hidden relative bg-[#c9d4d9] dark:bg-[#2d3238] transition-colors duration-500 p-4 flex flex-col justify-center items-center"></main>
+
     <FallingSakura client:load />
 
     <TopControls />
