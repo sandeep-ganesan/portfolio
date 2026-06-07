@@ -29,10 +29,9 @@ const pageDesc = initialLang === 'ja'
     <LanguageToggle />
     <WindowManager client:only="react" />
 
-    <h1 class="text-5xl md:text-6xl font-bold text-[#5c4f4f] dark:text-[#e4dcc6] transition-colors duration-500 mb-8 tracking-widest pointer-events-none drop-shadow-sm select-none relative z-10">
-      <span class="lang-swap" data-en="Hi, I'm " data-ja="こんにちは、">Hi, I'm </span>
-      <span class="text-[#d48c70] drop-shadow-md lang-swap" data-en="Sandeep!" data-ja="サンディープです！">Sandeep!</span>
-    </h1>
+    <h1 class="-mt-20 text-5xl md:text-6xl font-bold text-[#5c4f4f] dark:text-[#e4dcc6] transition-colors duration-500 mb-8 tracking-widest pointer-events-none drop-shadow-sm select-none relative z-10">
+  <span class="lang-swap" data-en="Hi, I'm " data-ja="こんにちは、">Hi, I'm </span><span class="text-[#d48c70] drop-shadow-md lang-swap" data-en="Sandeep" data-ja="サンディープ">Sandeep</span><span class="lang-swap" data-en="!" data-ja="です！">!</span>
+</h1>
 
     <Clock />
 
