@@ -1,4 +1,4 @@
-**Portfolio**
+# Portfolio
 
 A minimalist Astro-based portfolio application designed as an interactive, cozy, retro operating system desktop environment. The platform provides a playful yet highly optimized space to showcase software engineering work, projects, and personal background through a tactile, window-based interface.
 
