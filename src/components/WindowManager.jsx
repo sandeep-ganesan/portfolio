@@ -294,7 +294,23 @@ function ProjectsContent() {
         ],
         architecture: "Built on an Astro foundation to ship zero-JavaScript static HTML by default. Interactive elements like the draggable windows and dock are injected as React 'Islands', utilizing Nanostores to share global state (like active windows and focus hierarchy) across isolated components."
       }
-    }
+    },
+    {
+      id: 5,
+      title: "gomigomi",
+      category: "academic",
+      stack: "Next.js • PostgreSQL • Prisma",
+      description: "A gamified, point-based lottery platform for the second-hand goods market that replaces traditional sales with verifiable draws.",
+      details: {
+        features: [
+          "Probability Proportional to Size (PPS) Algorithm",
+          "Virtual Economy & Entry Boosting",
+          "Secure OAuth & Role Management",
+          "Automated Draw Resolution"
+        ],
+        architecture: "Built on a Next.js App Router frontend with a PostgreSQL/Prisma backend, utilizing Upstash rate-limiting and distributed cron locking to safely automate lottery finalization and point transfers."
+      }
+  }
   ];
 
   const filteredProjects = filter === 'all' 
