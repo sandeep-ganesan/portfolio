@@ -298,7 +298,7 @@ function ProjectsContent() {
     {
       id: 5,
       title: "gomigomi",
-      category: "academic",
+      category: "school",
       stack: "Next.js • PostgreSQL • Prisma",
       description: "A gamified, point-based lottery platform for the second-hand goods market that replaces traditional sales with verifiable draws.",
       details: {
