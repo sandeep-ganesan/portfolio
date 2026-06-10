@@ -463,7 +463,7 @@ function ContactContent() {
           
           {/* Resume Download Button */}
           <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-4 p-4 border-4 border-[#5c4f4f] bg-[#c9d4d9] hover:bg-[#8f9ca6] hover:text-[#f4ece6] transition-all group mt-4 shadow-[4px_4px_0px_0px_rgba(92,79,79,0.3)] hover:translate-y-1 hover:shadow-none text-center">
-            <span className="font-bold uppercase tracking-wider text-[#2c2626] group-hover:text-[#f4ece6]">{lang === 'en' ? 'View Resume (404 WIP)' : '履歴書 (404 WIP)'}</span>
+            <span className="font-bold uppercase tracking-wider text-[#2c2626] group-hover:text-[#f4ece6]">{lang === 'en' ? 'View Resume' : '履歴書を見る'}</span>
           </a>
 
         </div>
