@@ -14,7 +14,7 @@
 </div>
 
 <script>
-  import { currentLang } from '../store/locale.js';
+  import { currentLang, setLanguage } from '../store/locale.js';
 
   const langBtn = document.getElementById('lang-toggle');
   const langText = document.getElementById('lang-text');
@@ -27,6 +27,6 @@
 
   langBtn?.addEventListener('click', () => {
     const nextLang = currentLang.get() === 'en' ? 'ja' : 'en';
-    currentLang.set(nextLang);
+    setLanguage(nextLang);
   });
 </script>

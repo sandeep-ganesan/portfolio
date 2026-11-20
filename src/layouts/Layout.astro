@@ -2,16 +2,18 @@
 interface Props {
   title: string;
   description?: string;
+  lang?: string;
 }
 
-const { 
+const {
   title,
+  lang = "en",
   description = "Sandeep Ganesan's personal portfolio, featuring projects and contact information." 
 } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en" class="dark">
+<html lang={lang} class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />

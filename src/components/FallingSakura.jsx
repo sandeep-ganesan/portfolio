@@ -25,6 +25,16 @@ const PIXEL_SHAPES = {
 
 export default function FallingSakura() {
   const [petals, setPetals] = useState([]);
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  // Respect the OS "reduce motion" setting; follows changes while the page is open
+  useEffect(() => {
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReduceMotion(query.matches);
+    const onChange = (e) => setReduceMotion(e.matches);
+    query.addEventListener('change', onChange);
+    return () => query.removeEventListener('change', onChange);
+  }, []);
 
   useEffect(() => {
     const colors = ['bg-[#f4c2c2]', 'bg-[#f8d7da]', 'bg-[#eeb4b4]', 'bg-[#ffe4e1]'];
@@ -43,6 +53,8 @@ export default function FallingSakura() {
     
     setPetals(newPetals);
   }, []);
+
+  if (reduceMotion) return null;
 
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">

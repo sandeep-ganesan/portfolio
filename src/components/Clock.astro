@@ -1,12 +1,14 @@
 ---
 // src/components/Clock.astro
 ---
-<div 
-  id="desktop-clock" 
-  class="text-7xl md:text-9xl font-bold text-[#5c4f4f] dark:text-[#e4dcc6] mb-8 cursor-pointer hover:text-[#d97373] dark:hover:text-[#d97373] transition-colors select-none drop-shadow-sm tracking-widest text-center pointer-events-auto"
+<button
+  type="button"
+  id="desktop-clock"
+  aria-haspopup="dialog"
+  class="text-7xl md:text-9xl font-bold text-[#5c4f4f] dark:text-[#e4dcc6] mb-8 cursor-pointer hover:text-[#d97373] dark:hover:text-[#d97373] transition-colors select-none drop-shadow-sm tracking-widest text-center pointer-events-auto relative z-10 focus:outline-none focus-visible:outline-dashed focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#d97373]"
 >
   --:--
-</div>
+</button>
 
 <script>
   import { openWindow } from '../store/windows.js';

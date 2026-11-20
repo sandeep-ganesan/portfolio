@@ -1,17 +1,21 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useStore } from '@nanostores/react';
-import { openWindows, closeWindow, focusWindow } from '../store/windows';
+import { openWindows, closeWindow, closeTopWindow, focusWindow } from '../store/windows';
 import { currentLang } from '../store/locale';
+import ClockWindow from './ClockWindow';
 
 function DraggableWindow({ win, index }) {
   const windowRef = useRef(null);
   const lang = useStore(currentLang);
 
+  // The clock window is smaller and sized by its scene instead of a fixed height
+  const isCompact = win.id === 'clock';
+
   // Stagger new windows based on how many are open, adjusting for small browser sizes
   const [pos, setPos] = useState(() => {
     if (typeof window !== 'undefined') {
-      const safeWidth = Math.min(900, window.innerWidth * 0.95);
-      const safeHeight = Math.min(750, window.innerHeight * 0.90);
+      const safeWidth = Math.min(isCompact ? 720 : 900, window.innerWidth * 0.95);
+      const safeHeight = Math.min(isCompact ? 450 : 750, window.innerHeight * 0.90);
       
       // Create a random offset between -25px and +25px
       const jitterX = Math.floor(Math.random() * 50) - 100;
@@ -29,6 +33,20 @@ function DraggableWindow({ win, index }) {
   
   const [isDragging, setIsDragging] = useState(false);
   const dragOffset = useRef({ x: 0, y: 0 });
+
+  // Move keyboard focus into the window when it opens
+  useEffect(() => {
+    windowRef.current?.focus({ preventScroll: true });
+  }, []);
+
+  const displayTitle = lang === 'en'
+    ? win.title
+    : (win.id === 'about' ? '自己紹介'
+      : win.id === 'projects' ? 'プロジェクト'
+      : win.id === 'contact' ? '連絡先'
+      : win.id === 'credits' ? 'クレジット'
+      : win.id === 'clock' ? '時刻.txt'
+      : win.title);
 
   const handlePointerDown = (e) => {
     setIsDragging(true);
@@ -66,11 +84,19 @@ function DraggableWindow({ win, index }) {
   };
 
   return (
-    <div 
+    <div
       ref={windowRef}
+      id={`window-${win.id}`}
+      role="dialog"
+      aria-labelledby={`window-title-${win.id}`}
+      tabIndex={-1}
       onPointerDown={() => focusWindow(win.id)}
       // NEW: Added max-w-[95vw] and max-h-[90vh] so the window shrinks on smaller monitors
-      className="absolute flex flex-col bg-[#f4ece6] pointer-events-auto max-md:!left-0 max-md:!top-0 max-md:!w-full max-md:!h-[100dvh] max-md:border-none max-md:shadow-none border-4 border-[#5c4f4f] shadow-[8px_8px_0px_0px_rgba(92,79,79,0.3)] w-[900px] h-[750px] max-w-[95vw] max-h-[90vh]"
+      className={`absolute flex flex-col bg-[#f4ece6] pointer-events-auto outline-none border-4 border-[#5c4f4f] shadow-[8px_8px_0px_0px_rgba(92,79,79,0.3)] max-w-[95vw] max-h-[90vh] ${
+        isCompact
+          ? 'w-[720px]'
+          : 'w-[900px] h-[750px] max-md:!left-0 max-md:!top-0 max-md:!w-full max-md:!h-[100dvh] max-md:border-none max-md:shadow-none'
+      }`}
       style={{ 
         left: pos.x, 
         top: pos.y, 
@@ -84,26 +110,22 @@ function DraggableWindow({ win, index }) {
         onPointerUp={handlePointerUp}
         className="bg-[#8f9ca6] text-[#2c2626] px-3 py-2 flex justify-between items-center border-b-4 border-[#5c4f4f] cursor-default select-none touch-none max-md:py-3"
       >
-        <span className="font-bold tracking-widest text-sm uppercase pointer-events-none">
-          {lang === 'en' 
-            ? win.title 
-              : (win.id === 'about' ? '自己紹介' 
-              : win.id === 'projects' ? 'プロジェクト' 
-              : win.id === 'contact' ? '連絡先' 
-              : win.id === 'credits' ? 'クレジット' 
-              : win.title)}
+        <span id={`window-title-${win.id}`} className="font-bold tracking-widest text-sm uppercase pointer-events-none">
+          {displayTitle}
         </span>
         <button 
+          type="button"
+          aria-label={lang === 'en' ? `Close ${displayTitle}` : `${displayTitle}を閉じる`}
           onPointerDown={(e) => e.stopPropagation()} 
           onClick={() => closeWindow(win.id)}
-          className="text-[#2c2626] hover:text-[#d97373] font-bold cursor-default transition-transform hover:scale-110 text-lg md:text-base px-2"
+          className="text-[#2c2626] hover:text-[#d97373] font-bold cursor-default transition-transform hover:scale-110 text-lg md:text-base px-2 focus:outline-none focus-visible:outline-dashed focus-visible:outline-2 focus-visible:outline-[#d97373]"
         >
-          [X]
+          <span aria-hidden="true">[X]</span>
         </button>
       </div>
 
       {/* --- THE WINDOW CONTENT --- */}
-      <div className="flex-1 p-4 md:p-6 overflow-y-auto text-[#5c4f4f] leading-relaxed cursor-auto">
+      <div className={`flex-1 overflow-y-auto text-[#5c4f4f] leading-relaxed cursor-auto ${isCompact ? '' : 'p-4 md:p-6'}`}>
         
         {win.id === 'about' && (
           <div className="flex flex-col gap-4 h-full overflow-y-auto md:pr-2 pb-12 pointer-events-auto">
@@ -111,7 +133,7 @@ function DraggableWindow({ win, index }) {
             {/* Top Profile Header */}
             <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-6 border-b-4 border-[#8f9ca6] pb-6">
               <div className="w-48 h-48 md:w-64 md:h-64 bg-[#c9d4d9] border-4 border-[#5c4f4f] flex-shrink-0 shadow-[4px_4px_0px_0px_rgba(92,79,79,0.2)]">
-                <img src="media/bk_pic.png" alt="Profile" className="w-full h-full object-cover pixel-art" />
+                <img src="media/bk_pic.png" alt={lang === 'en' ? 'Hand-drawn profile illustration of Sandeep' : 'サンディープの手描きプロフィールイラスト'} className="w-full h-full object-cover pixel-art" />
               </div>
               <div>
                 <h2 className="text-3xl font-bold tracking-widest text-[#2c2626]">{lang === 'en' ? 'Sandeep Ganesan' : 'サンディープ　ガネーサン'}</h2>
@@ -171,9 +193,7 @@ function DraggableWindow({ win, index }) {
         )}
 
         {win.id === 'clock' && (
-          <div className="flex items-center justify-center h-full text-center">
-            <p className="opacity-50 italic">Time Zone is JST. This window is a WIP ({'>'}ᴗ•) !</p>
-          </div>
+          <ClockWindow />
         )}
 
         {win.id === 'credits' && (
@@ -335,13 +355,13 @@ function ProjectsContent() {
           en: [
             "Custom React window manager with draggable bounds clamping",
             "Simplistic design that is easy to navigate and mobile-friendly",
-            "Features background music and language options (WIP)",
+            "Background music and an English/Japanese language toggle",
             "Global state management across UI components using Nanostores"
           ],
           ja: [
             "画面外に出ないようドラッグ範囲を制限した、React製の独自ウィンドウマネージャー",
             "操作しやすく、モバイルにも対応したシンプルなデザイン",
-            "BGMと言語切り替え機能（開発中）",
+            "BGMと英語・日本語の切り替え機能",
             "NanostoresによるUIコンポーネント間のグローバル状態管理"
           ]
         },
@@ -557,7 +577,7 @@ function ContactContent() {
 
           <a href="https://linkedin.com/in/sandeep-ganesan-7ab40b366" target="_blank" rel="noopener noreferrer" className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4 p-4 border-4 border-[#5c4f4f] bg-[#e4dcc6] hover:bg-[#d97373] hover:text-[#f4ece6] transition-colors group">
             <span className="font-bold uppercase tracking-wider">LinkedIn</span>
-            <span className="text-sm opacity-80 group-hover:opacity-100 md:ml-auto break-all sm:break-normal">Connect with me</span>
+            <span className="text-sm opacity-80 group-hover:opacity-100 md:ml-auto break-all sm:break-normal">{lang === 'en' ? 'Connect with me' : 'つながりましょう'}</span>
           </a>
           
           {/* Resume Download Button */}
@@ -574,6 +594,15 @@ function ContactContent() {
 // 2. The Main Manager that renders all open windows
 export default function WindowManager() {
   const windows = useStore(openWindows);
+
+  // Esc closes the window on top
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') closeTopWindow();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   return (
     <>
